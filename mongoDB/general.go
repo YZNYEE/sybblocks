@@ -3,7 +3,6 @@ package mongoDB
 import (
 	"SYNBLOCK/entity"
 	"context"
-	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -18,10 +17,19 @@ var client *mongo.Client
 var DB *mongo.Database
 var err error
 var Coll *mongo.Collection
+var Colltx *mongo.Collection
 
 func InsertBlock(mongoblock *entity.Mongoblock, collection *mongo.Collection) {
-	fmt.Println(mongoblock)
+	t := mongoblock.Transaction
+	//fmt.Println(mongoblock, len(t))
+	for i := 0; i < len(t); i++ {
+		InsertTx(t[i])
+	}
 	collection.InsertOne(context.TODO(), mongoblock)
+}
+
+func InsertTx(transaction *entity.MongoTransaction) {
+	Colltx.InsertOne(context.TODO(), transaction)
 }
 
 func FindBlockbyNum(n uint64) *entity.Mongoblock {
@@ -70,6 +78,16 @@ func Insertlastone(lastone uint64) {
 	Coll.InsertOne(context.TODO(), m)
 }
 
+func Updatelastone(lastone uint64) {
+	var m entity.Mongounit
+	var prem entity.Mongounit
+	m.Key = "lastone"
+	prem.Key = "lastone"
+	m.Value = lastone
+	prem.Value = lastone - 1
+	Coll.UpdateOne(context.TODO(), prem, m)
+}
+
 func init() {
 	clientoptions = options.Client().ApplyURI(url)
 	client, err = mongo.Connect(context.TODO(), clientoptions)
@@ -78,5 +96,6 @@ func init() {
 	}
 	DB = client.Database("test")
 	Coll = DB.Collection("block")
+	Colltx = DB.Collection("TX")
 
 }

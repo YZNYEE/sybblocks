@@ -36,6 +36,6 @@ var client *ethclient.Client
 var err error
 
 func init() {
-	client, err = ethclient.Dial("https://ropsten.etherscan.io/")
+	client, err = ethclient.Dial("https://ropsten.infura.io/v3/4065fc77233f4f18886d7236e9042ca6")
 
 }

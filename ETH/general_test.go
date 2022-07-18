@@ -2,6 +2,7 @@ package ETH
 
 import (
 	"fmt"
+	"log"
 	"testing"
 )
 
@@ -12,8 +13,10 @@ func TestGetblocknum(t *testing.T) {
 }
 func TestGetBlockbyNum(t *testing.T) {
 	//b2 := GetBlockbyNum(1)
-	b1 := GetBlockbyNum(12594202)
-
+	b1, err := GetBlockbyNum(12594209)
+	if err != nil {
+		log.Fatal(err)
+	}
 	fmt.Println(b1.Transactions(), len(b1.Transactions()))
 
 	//fmt.Println(b1.Header().)
